@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Storage Grid</title>
+  <title>Grist Storage Grid Widget</title>
   <style>
     :root {
       --cell-size: min(50px, calc((100vw - 4rem) / var(--cols, 9)));
@@ -12,7 +11,6 @@
       --error-color: #d32f2f;
       --warning-color: #ff9800;
       --success-color: #4caf50;
-      /* Grid colors */
       --color-temporary: #00BCD4;
       --color-permanent: #FF9800;
       --color-exported: #4CAF50;
@@ -25,13 +23,11 @@
       background: #f5f5f5;
       min-height: 100vh;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 1rem;
     }
-
     .grid-container {
       overflow-x: auto;
       margin-bottom: 1rem;
@@ -40,7 +36,6 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-
     .grid {
       display: grid;
       gap: 4px;
@@ -51,7 +46,6 @@
       border-radius: 8px;
       position: relative;
     }
-
     .cell {
       background: white;
       border: 1px solid #ccc;
@@ -70,43 +64,19 @@
       margin: 0;
       border-width: 1px;
     }
-
     .cell.empty {
       background: white;
       border: 1.5px solid #ccc;
     }
-
-    /* Status-based colors */
-    .cell[data-storagetime="permanent"],
-    .status-permanent { 
-      background: var(--color-permanent);
-      border-color: rgba(0,0,0,0.1);
-    }
-
-    .cell[data-storagetime="temporary"],
-    .status-temporary { 
-      background: var(--color-temporary);
-      border-color: rgba(0,0,0,0.1);
-    }
-
-    .cell[data-storagetime="exported"],
-    .status-exported { 
-      background: var(--color-exported);
-      border-color: rgba(0,0,0,0.1);
-    }
-
-    .cell[data-storagetime="planned"],
-    .status-planned {
-      background: var(--color-planned);
-      border-color: rgba(0,0,0,0.1);
-    }
-
+    .cell[data-storagetime="permanent"], .status-permanent { background: var(--color-permanent); border-color: rgba(0,0,0,0.1);}
+    .cell[data-storagetime="temporary"], .status-temporary { background: var(--color-temporary); border-color: rgba(0,0,0,0.1);}
+    .cell[data-storagetime="exported"], .status-exported { background: var(--color-exported); border-color: rgba(0,0,0,0.1);}
+    .cell[data-storagetime="planned"], .status-planned { background: var(--color-planned); border-color: rgba(0,0,0,0.1);}
     .cell:hover {
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       z-index: 1;
     }
-
     .position-label {
       position: absolute;
       top: 50%;
@@ -119,7 +89,6 @@
       z-index: 1;
       pointer-events: none;
     }
-
     .info-panel {
       background: white;
       padding: 1.5rem;
@@ -129,19 +98,16 @@
       margin: 1rem auto;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-
     .empty-state {
       text-align: center;
       padding: 2rem;
       color: #666;
     }
-
     .empty-state-icon {
       font-size: 48px;
       margin-bottom: 1rem;
       color: #ccc;
     }
-
     .error {
       color: var(--error-color);
       background: #ffebee;
@@ -152,13 +118,11 @@
       align-items: center;
       gap: 0.5rem;
     }
-
     .loading {
       position: relative;
       pointer-events: none;
       opacity: 0.7;
     }
-
     .loading::after {
       content: '';
       position: absolute;
@@ -172,11 +136,9 @@
       border-radius: 50%;
       animation: loading 0.6s linear infinite;
     }
-
     @keyframes loading {
       to { transform: rotate(360deg); }
     }
-
     @media (max-width: 768px) {
       :root {
         --cell-size: min(40px, calc((100vw - 3rem) / var(--cols, 9)));
@@ -203,9 +165,9 @@
       </div>
     </div>
   </div>
-
+  <!-- Grist plugin API -->
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <!-- Your widget logic -->
   <script src="script.js"></script>
 </body>
 </html>
-
