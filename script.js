@@ -5,7 +5,7 @@ const boxTypes = {
     rows: 9, 
     cols: 9, 
     numeric: false,
-    name: '9x9 plastic grid with A1-I9 format'
+    name: '9x9 plastic grid with A1-A9 format'
   },
   '50ml': { 
     rows: 8, 
@@ -101,11 +101,13 @@ function initializeGrid(boxType, boxNumber) {
 function normalizeSamplePosition(pos, config) {
   if (!pos) return '';
   pos = String(pos).trim();
-  if (config && config.numeric) {
+  if (config.numeric) {
+    // Accept both '1', '01', '001' as '01', etc.
     let n = parseInt(pos, 10);
     if (!isNaN(n)) return n.toString().padStart(2, '0');
     return pos;
   } else {
+    // Accept both 'A1', 'a1', 'A01', etc. as 'A1', 'A2', ...
     let match = pos.match(/^([A-Za-z])(\d{1,2})$/);
     if (match) {
       return match[1].toUpperCase() + parseInt(match[2], 10);
@@ -160,7 +162,6 @@ grist.onRecords(table => {
 });
 
 grist.onRecord(async record => {
-  // Always clear everything first
   grid.innerHTML = '';
   info.innerHTML = '';
   gridTitle.textContent = 'Loading...';
@@ -174,34 +175,28 @@ grist.onRecord(async record => {
   currentBoxId = record.BoxID || record.id;
   const boxFormat = record.BoxFormat || record.BoxType;
   const boxNumber = record.BoxNumber;
-
-  // Always re-initialize the grid for the new box type
   initializeGrid(boxFormat, boxNumber);
-
-  // Wait for grid to be initialized before filling cells (longer delay for safety)
-  setTimeout(async () => {
-    try {
-      const samples = await grist.rpc.invoke('viewTable', 'Samples', {
-        filter: { box_id: currentBoxId }
-      });
-      if (!samples || !samples.length) return;
-      samples.forEach(sample => {
-        if (sample.box_position) {
-          const normPos = normalizeSamplePosition(sample.box_position, currentBoxType);
-          const cell = grid.querySelector(`.cell[data-position="${normPos}"]`);
-          if (cell) {
-            cell.classList.remove('empty');
-            cell.classList.add('filled');
-            if (sample.sample_conservation_method) {
-              cell.dataset.storagetime = sample.sample_conservation_method.toLowerCase();
-            }
+  try {
+    const samples = await grist.rpc.invoke('viewTable', 'Samples', {
+      filter: { box_id: currentBoxId }
+    });
+    if (!samples || !samples.length) return;
+    samples.forEach(sample => {
+      if (sample.box_position) {
+        const normPos = normalizeSamplePosition(sample.box_position, currentBoxType);
+        const cell = grid.querySelector(`.cell[data-position="${normPos}"]`);
+        if (cell) {
+          cell.classList.remove('empty');
+          cell.classList.add('filled');
+          if (sample.sample_conservation_method) {
+            cell.dataset.storagetime = sample.sample_conservation_method.toLowerCase();
           }
         }
-      });
-    } catch (err) {
-      info.innerHTML = `<div class="error">Note: Sample details currently unavailable</div>`;
-    }
-  }, 30); // 30ms delay to ensure DOM is ready
+      }
+    });
+  } catch (err) {
+    info.innerHTML = `<div class="error">Note: Sample details currently unavailable</div>`;
+  }
 });
 
-showEmptyState();
+showEmptyState(); 
