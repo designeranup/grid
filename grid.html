@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Grist Storage Grid Widget</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storage Grid</title>
   <style>
     :root {
       --cell-size: min(50px, calc((100vw - 4rem) / var(--cols, 9)));
@@ -11,141 +12,178 @@
       --error-color: #d32f2f;
       --warning-color: #ff9800;
       --success-color: #4caf50;
+      /* Grid colors */
       --color-temporary: #00BCD4;
       --color-permanent: #FF9800;
       --color-exported: #4CAF50;
       --color-planned: #FFEB3B;
     }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: #f5f5f5;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-    .grid-container {
-      overflow-x: auto;
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .grid {
-      display: grid;
-      gap: 4px;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      position: relative;
-    }
-    .cell {
-      background: white;
-      border: 1px solid #ccc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 12px;
-      width: var(--cell-size);
-      height: var(--cell-size);
-      position: relative;
-      border-radius: 50%;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      margin: 0;
-      border-width: 1px;
-    }
-    .cell.empty {
-      background: white;
-      border: 1.5px solid #ccc;
-    }
-    .cell[data-storagetime="permanent"], .status-permanent { background: var(--color-permanent); border-color: rgba(0,0,0,0.1);}
-    .cell[data-storagetime="temporary"], .status-temporary { background: var(--color-temporary); border-color: rgba(0,0,0,0.1);}
-    .cell[data-storagetime="exported"], .status-exported { background: var(--color-exported); border-color: rgba(0,0,0,0.1);}
-    .cell[data-storagetime="planned"], .status-planned { background: var(--color-planned); border-color: rgba(0,0,0,0.1);}
-    .cell:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      z-index: 1;
-    }
-    .position-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 16px;
-      color: rgba(0, 0, 0, 0.8);
-      font-weight: normal;
-      font-family: Arial, sans-serif;
-      z-index: 1;
-      pointer-events: none;
-    }
-    .info-panel {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      max-width: 800px;
-      margin: 1rem auto;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-    }
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 1rem;
-      color: #ccc;
-    }
-    .error {
-      color: var(--error-color);
-      background: #ffebee;
-      padding: 1rem;
-      border-radius: 4px;
-      margin: 0.5rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .loading {
-      position: relative;
-      pointer-events: none;
-      opacity: 0.7;
-    }
-    .loading::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 24px;
-      height: 24px;
-      margin: -12px 0 0 -12px;
-      border: 2px solid var(--primary-color);
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: loading 0.6s linear infinite;
-    }
-    @keyframes loading {
-      to { transform: rotate(360deg); }
-    }
-    @media (max-width: 768px) {
-      :root {
-        --cell-size: min(40px, calc((100vw - 3rem) / var(--cols, 9)));
-      }
-    }
-  </style>
-</head>
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 1rem;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.grid-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.grid {
+  display: grid;
+  gap: 4px;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  position: relative;
+}
+
+.cell {
+  background: white;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  position: relative;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  margin: 0;
+  border-width: 1px;
+}
+
+.cell.empty {
+  background: white;
+  border: 1.5px solid #ccc;
+}
+
+/* Status-based colors */
+.cell[data-storagetime="permanent"],
+.status-permanent { 
+  background: var(--color-permanent);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.cell[data-storagetime="temporary"],
+.status-temporary { 
+  background: var(--color-temporary);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.cell[data-storagetime="exported"],
+.status-exported { 
+  background: var(--color-exported);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.cell[data-storagetime="planned"],
+.status-planned {
+  background: var(--color-planned);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.cell:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.position-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.8);
+  font-weight: normal;
+  font-family: Arial, sans-serif;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.info-panel {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  max-width: 800px;
+  margin: 1rem auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 1rem;
+  color: #ccc;
+}
+
+.error {
+  color: var(--error-color);
+  background: #ffebee;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid var(--primary-color);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: loading 0.6s linear infinite;
+}
+
+@keyframes loading {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cell-size: min(40px, calc((100vw - 3rem) / var(--cols, 9)));
+  }
+}
+
+  </style></head>
 <body>
   <div class="container">
     <div class="grid-container">
@@ -165,9 +203,265 @@
       </div>
     </div>
   </div>
-  <!-- Grist plugin API -->
+
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-  <!-- Your widget logic -->
-  <script src="script.js"></script>
+  <script>
+    const boxTypes = {
+      'plasticeppis': { 
+        rows: 9, 
+        cols: 9, 
+        numeric: false,
+        name: '9x9 plastic grid with A1-A9 format'
+      },
+      '50ml': { 
+        rows: 8, 
+        cols: 4, 
+        numeric: true,
+        name: 'Box 50ml 8x4 grid'
+      },
+      '15ml': { 
+        rows: 12, 
+        cols: 6, 
+        numeric: true,
+        name: 'Box 15ml 12x6 grid'
+      },
+      'plastic15ml': {
+        rows: 5,
+        cols: 5,
+        numeric: true,
+        name: 'Box 15ml (5x5) grid'
+      },
+      'eppis': {
+        rows: 9,
+        cols: 9,
+        numeric: true,
+        name: 'Box eppis 9x9 grid'
+      }
+    };
+
+    const grid = document.getElementById('grid');
+    const gridTitle = document.getElementById('gridTitle');
+    const info = document.getElementById('info');
+    
+    let currentBoxId = null;
+
+    function showEmptyState() {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon"></div>
+          <h3>No Box Selected</h3>
+          <p>Select a row in BoxOverview to view its grid.</p>
+        </div>
+      `;
+      gridTitle.textContent = 'Select a Box from BoxOverview';
+    }
+
+    function initializeGrid(boxType) {
+      console.log('initializeGrid called with:', boxType);
+      
+      if (!boxType) {
+        console.log('No boxType provided');
+        showEmptyState();
+        return;
+      }
+
+      // Ensure boxType is a string and normalize it
+      const normalizedType = String(boxType).toLowerCase().trim();
+      console.log('Normalized box type:', normalizedType, 'Available types:', Object.keys(boxTypes));
+      
+      const config = boxTypes[normalizedType];
+      console.log('Found config:', config);
+      
+      if (!config) {
+        console.error('Unknown box type:', boxType);
+        info.innerHTML = `<div class="error">Unknown box type: ${boxType}</div>`;
+        showEmptyState();
+        return;
+      }
+
+      // Force clean slate
+      grid.innerHTML = '';
+      document.documentElement.style.setProperty('--cols', config.cols);
+      grid.style.gridTemplateColumns = `repeat(${config.cols}, var(--cell-size))`;
+      grid.style.gridTemplateRows = `repeat(${config.rows}, var(--cell-size))`;
+      
+      const totalCells = config.rows * config.cols;
+      
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell empty';
+        
+        let position;
+        if (config.numeric) {
+          position = (i + 1).toString().padStart(2, '0');
+        } else {
+          const row = String.fromCharCode(65 + Math.floor(i / config.cols));
+          const col = (i % config.cols) + 1;
+          position = `${row}${col}`;
+        }
+        
+        cell.dataset.position = position;
+        cell.innerHTML = `<div class="position-label">${position}</div>`;
+        
+        cell.addEventListener('click', () => handleCellClick(position));
+        grid.appendChild(cell);
+      }
+
+      gridTitle.textContent = config.name;
+    }
+
+    // Initialize Grist plugin
+    grist.ready({
+      requiredTables: ['BoxOverview', 'Samples'],
+      columns: ['BoxID', 'BoxFormat'],  // Only keep essential columns
+      allowSelectBy: true,
+      defaultDisableSelect: true  // Prevent automatic selection of first row
+    });
+
+    // Set up record handling
+    grist.onRecord(async record => {
+      console.log("Record received:", record);
+      if (!record) {
+        currentBoxId = null;
+        showEmptyState();
+        return;
+      }
+      
+      currentBoxId = record.BoxID;
+      console.log("Current Box ID set to:", currentBoxId);
+      
+      // Clear everything first
+      grid.innerHTML = '';
+      info.innerHTML = '';
+      gridTitle.textContent = 'Loading...';
+      
+      // Get box configuration
+      const boxFormat = String(record.BoxFormat || '').toLowerCase().trim();
+      console.log('Box format:', boxFormat, 'Available types:', Object.keys(boxTypes));
+      
+      const config = boxTypes[boxFormat];
+      console.log('Box config:', config);
+      
+      if (!config) {
+        console.error('Unknown box type:', boxFormat);
+        info.innerHTML = `<div class="error">Unknown box type: ${record.BoxFormat}</div>`;
+        showEmptyState();
+        return;
+      }
+
+      // Set up grid layout
+      document.documentElement.style.setProperty('--cols', config.cols);
+      grid.style.gridTemplateColumns = `repeat(${config.cols}, var(--cell-size))`;
+      grid.style.gridTemplateRows = `repeat(${config.rows}, var(--cell-size))`;
+      
+      // Create cells
+      const totalCells = config.rows * config.cols;
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell empty';
+        
+        let position;
+        if (config.numeric) {
+          position = (i + 1).toString().padStart(2, '0');
+        } else {
+          const row = String.fromCharCode(65 + Math.floor(i / config.cols));
+          const col = (i % config.cols) + 1;
+          position = `${row}${col}`;
+        }
+        
+        cell.dataset.position = position;
+        cell.innerHTML = `<div class="position-label">${position}</div>`;
+        cell.addEventListener('click', () => handleCellClick(position));
+        grid.appendChild(cell);
+      }
+
+      gridTitle.textContent = config.name;
+      
+      try {
+        // Get samples using viewTable
+        const samples = await grist.rpc.invoke('viewTable', 'Samples', {
+          filter: { box_id: currentBoxId }  // Filter samples by current box_id
+        });
+        console.log('Got samples:', samples);
+        
+        if (!samples || !samples.length) {
+          console.log('No samples found for box:', currentBoxId);
+          return;
+        }
+
+        // Update cells with sample data
+        samples.forEach(sample => {
+          if (sample.box_position) {
+            const pos = String(sample.box_position).toUpperCase();
+            console.log(`Looking for cell with position: ${pos}`);
+            const cell = document.querySelector(`.cell[data-position="${pos}"]`);
+            if (cell) {
+              console.log(`Found cell for position ${pos}, updating...`);
+              cell.classList.remove('empty');
+              cell.classList.add('filled');
+              if (sample.sample_conservation_method) {
+                cell.dataset.storagetime = sample.sample_conservation_method.toLowerCase();
+              }
+            } else {
+              console.log(`No cell found for position ${pos}`);
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading samples:', err);
+        info.innerHTML = `<div class="error">Note: Sample data currently unavailable</div>`;
+      }
+    });
+
+    // Show initial empty state
+    showEmptyState();
+
+    async function handleCellClick(position) {
+      if (!currentBoxId) return;
+      
+      try {
+        // Get samples using viewTable
+        const samples = await grist.rpc.invoke('viewTable', 'Samples');
+        
+        if (!samples) {
+          throw new Error('No samples data available');
+        }
+
+        const sample = samples.find(s => 
+          String(s.box_id) === String(currentBoxId) && 
+          String(s.box_position) === String(position)
+        );
+        
+        if (sample) {
+          info.innerHTML = `
+            <h3>Sample Details</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <div>
+                <p><strong>Sample ID:</strong> ${sample.sample_id || '-'}</p>
+                <p><strong>Box Name:</strong> ${sample.box_name || '-'}</p>
+                <p><strong>Position:</strong> ${sample.box_position || '-'}</p>
+                <p><strong>Temperature:</strong> ${sample.Temperature || '-'}</p>
+              </div>
+              <div>
+                <p><strong>Sample Time:</strong> ${sample.sample_time || '-'}</p>
+                <p><strong>Box ID:</strong> ${sample.box_id || '-'}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          info.innerHTML = `
+            <div class="empty-state">
+              <h3>Position ${position}</h3>
+              <p>No sample stored at this position.</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error fetching sample details:', error);
+        info.innerHTML = `<div class="error">Note: Sample details currently unavailable</div>`;
+      }
+    }
+  </script>
 </body>
 </html>
+
